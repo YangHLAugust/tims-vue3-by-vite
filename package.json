@@ -27,6 +27,7 @@
   "devDependencies": {
     "@vitejs/plugin-legacy": "^1.8.1",
     "@vitejs/plugin-vue": "^2.3.4",
+    "@purge-icons/generated": "^0.8.1",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",
     "eslint": "^8.13.0",

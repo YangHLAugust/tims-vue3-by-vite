@@ -98,15 +98,15 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     // The vite plugin used by the project. The quantity is large, so it is separately extracted and managed
     plugins: createVitePlugins(viteEnv, isBuild),
 
-    // optimizeDeps: {
-    //   // @iconify/iconify: The dependency is dynamically and virtually loaded by @purge-icons/generated, so it needs to be specified explicitly
-    //   include: [
-    //     '@vue/runtime-core',
-    //     '@vue/shared',
-    //     '@iconify/iconify',
-    //     'ant-design-vue/es/locale/zh_CN',
-    //     'ant-design-vue/es/locale/en_US',
-    //   ],
-    // },
+    optimizeDeps: {
+      // @iconify/iconify: The dependency is dynamically and virtually loaded by @purge-icons/generated, so it needs to be specified explicitly
+      include: [
+        '@vue/runtime-core',
+        '@vue/shared',
+        '@iconify/iconify',
+        'ant-design-vue/es/locale/zh_CN',
+        'ant-design-vue/es/locale/en_US',
+      ],
+    },
   };
 };
