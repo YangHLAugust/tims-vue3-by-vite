@@ -8,6 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "strictFunctionTypes": false,
+    "jsx": "preserve",
     "baseUrl": ".",
     "allowJs": true,
     "sourceMap": true,
@@ -30,6 +31,7 @@
     "tests/**/*.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
+    "src/**/*.tsx",
     "src/**/*.vue",
     "types/**/*.d.ts",
     "types/**/*.ts",
@@ -40,4 +42,3 @@
   ],
   "exclude": ["node_modules", "tests/server/**/*.ts", "dist", "**/*.js"]
 }
-

@@ -1,5 +1,7 @@
 import { useI18n } from "/@/utils/useI18n";
-import { ref, computed, unref } from "vue";
+import { ref, computed, unref, Ref } from "vue";
+import type { FormInstance } from "ant-design-vue/lib/form/Form";
+import type { NamePath } from "ant-design-vue/lib/form/interface";
 
 export enum LoginStateEnum {
   LOGIN,
@@ -41,18 +43,35 @@ export function useFormRules() {
   const getPasswordFormRule = computed(() =>
     createRule(t("sys.login.passwordPlaceholder"))
   );
-  const getCodeValueRule = computed(() =>
+  const getCodeValueFormRule = computed(() =>
     createRule(t("sys.login.codeValuePlaceholder"))
   );
 
   const getFormRules = computed(() => {
     const accountFormRule = unref(getAccountFormRule);
     const passwordFormRule = unref(getPasswordFormRule);
+    const codeValueFormRule = unref(getCodeValueFormRule);
     return {
-      sysLoginName: accountFormRule,
+      account: accountFormRule,
       password: passwordFormRule,
-      codeValue: getCodeValueRule,
+      codeValue: codeValueFormRule,
     };
   });
   return { getFormRules };
+}
+
+export function useFormValid<T extends Object = any>(
+  formRef: Ref<FormInstance>
+) {
+  const validate = computed(() => {
+    const form = unref(formRef);
+    return form?.validate ?? ((_nameList?: NamePath) => Promise.resolve());
+  });
+  async function validForm() {
+    const form = unref(formRef);
+    if (!form) return;
+    const data = await form.validate();
+    return data as T;
+  }
+  return { validate, validForm };
 }

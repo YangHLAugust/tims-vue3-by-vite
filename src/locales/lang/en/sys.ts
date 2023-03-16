@@ -6,6 +6,7 @@ export default {
     successTip: "Success Tip",
     errorMessage: "The operation failed, the system is abnormal!",
     timeoutMessage: "Login timed out, please log in again!",
+    lockedMessage: 'Your account has been locked, please contact the administrator!',
     apiTimeoutMessage:
       "The interface request timed out, please refresh the page and try again!",
     apiRequestFailed: "The interface request failed, please try again later!",

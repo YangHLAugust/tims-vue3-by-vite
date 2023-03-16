@@ -8,17 +8,17 @@ import type { AppRouteRecordRaw, AppRouteModule } from "/@/router/types";
 /* Layout */
 import Layout from "/@/layout/index.vue";
 // import.meta.globEager() 直接引入所有的模块 Vite 独有的功能
-// const modules = import.meta.globEager('./modules/**/*.ts');
-// const routeModuleList: AppRouteModule[] = [];
+const modules = import.meta.globEager("./modules/**/*.ts");
+const routeModuleList: AppRouteModule[] = [];
 
 // 加入到路由集合中
-// Object.keys(modules).forEach((key) => {
-//   const mod = modules[key].default || {};
-//   const modList = Array.isArray(mod) ? [...mod] : [mod];
-//   routeModuleList.push(...modList);
-// });
+Object.keys(modules).forEach((key) => {
+  const mod = modules[key].default || {};
+  const modList = Array.isArray(mod) ? [...mod] : [mod];
+  routeModuleList.push(...modList);
+});
 
-// export const asyncRoutes = [ ...routeModuleList];
+export const asyncRoutes = [...routeModuleList];
 
 const RootRoute: AppRouteRecordRaw = {
   path: "/",
@@ -47,7 +47,7 @@ const LoginRoute: AppRouteRecordRaw = {
   },
 };
 
-const basicRoutes = [LoginRoute, RootRoute];
+export const basicRoutes = [LoginRoute, RootRoute];
 
 // app router
 // 创建一个可以被 Vue 应用程序使用的路由实例

@@ -51,3 +51,11 @@ export function clearAuthAllCache(): void {
   ls.clear();
   ss.clear();
 }
+
+export function getToken() {
+  return getAuthCache(ACCESS_TOKEN_KEY);
+}
+
+export function getRefreshToken() {
+  return getAuthCache(REFRESH_TOKEN_KEY);
+}

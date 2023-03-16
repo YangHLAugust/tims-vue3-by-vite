@@ -7,10 +7,10 @@
     @keypress.enter="handleLogin"
   >
     <div class="tims-logo"></div>
-    <FormItem name="sysLoginName" class="enter-x">
+    <FormItem name="account" class="enter-x">
       <Input
         size="large"
-        v-model:value="formData.sysLoginName"
+        v-model:value.trim="formData.account"
         :placeholder="t('sys.login.accountPlaceholder')"
         class="fix-auto-fill"
       >
@@ -31,23 +31,23 @@
         </template>
       </InputPassword>
     </FormItem>
-    <FormItem name="codeValue" class="enter-x">
-      <div class="imgCode-container">
+    <div class="imgCode-container">
+      <FormItem name="codeValue" class="enter-x">
         <Input
           size="large"
           v-model:value="formData.codeValue"
           :placeholder="t('sys.login.codeValuePlaceholder')"
-          class="fix-auto-fill"
+          style="width: 220px"
         >
           <template #prefix>
             <MessageOutlined class="init-color" />
           </template>
         </Input>
-        <div class="imgCode" @click.prevent="getCode">
-          <img :src="codeImage" alt="" />
-        </div>
+      </FormItem>
+      <div class="imgCode" @click.prevent="getCode">
+        <img :src="codeImage" alt="" />
       </div>
-    </FormItem>
+    </div>
     <FormItem>
       <!-- No logic, you need to deal with it yourself -->
       <Checkbox v-model:checked="rememberMe" size="small">
@@ -56,7 +56,14 @@
         }}</span>
       </Checkbox>
     </FormItem>
-    <Button type="primary" shape="round" size="large" block>
+    <Button
+      type="primary"
+      shape="round"
+      size="large"
+      block
+      @click.native.prevent="handleLogin"
+      :loading="loading"
+    >
       {{ t("sys.login.loginButton") }}
     </Button>
   </Form>
@@ -71,24 +78,60 @@ import {
   MessageOutlined,
 } from "@ant-design/icons-vue";
 import { useI18n } from "/@/utils/useI18n";
-import { useFormRules } from "./userLogin";
+import { encrypt } from "/@/utils/cipher";
+import { useMessage } from "/@/hooks/web/useMessage";
+import { useFormRules, useFormValid } from "./userLogin";
+import { getLoginCodeApi } from "/@/api/user";
+import { useUserStoreWithOut } from "/@/store/modules/user";
 const FormItem = Form.Item;
 const InputPassword = Input.Password;
 
 const { getFormRules } = useFormRules();
 const { t } = useI18n();
-
-const codeImage = ref();
-const rememberMe = ref(false);
+const { notification, createErrorModal } = useMessage();
+const userStore = useUserStoreWithOut();
+const loading = ref(false);
+const formRef = ref();
+const codeImage = ref("");
+const rememberMe = ref(true);
 const formData = reactive({
-  sysLoginName: "",
-  password: "",
-  codeValue: null,
+  account: "yhl",
+  password: "Tengyun@60018",
+  codeValue: 1,
   uuid: null,
 });
 console.log(getFormRules);
-function getCode() {}
-function handleLogin() {}
+const { validForm } = useFormValid(formRef);
+
+async function getCode() {
+  const res = await getLoginCodeApi();
+  codeImage.value = res.img;
+  formData.uuid = res.uuid;
+}
+
+async function handleLogin() {
+  const data = await validForm();
+  if (!data) return;
+  try {
+    loading.value = true;
+    data.password = encrypt(data.password);
+    const params = reactive(Object.assign({}, formData, data));
+    console.log("params", params);
+    const res = await userStore.login(params);
+
+    if (res) {
+      notification.success({
+        message: t("sys.login.loginSuccessTitle"),
+        description: `${t("sys.login.loginSuccessDesc")}: ${res.persName}`,
+        duration: 3,
+      });
+    }
+  } finally {
+    loading.value = false;
+  }
+}
+
+getCode();
 </script>
 
 <style lang="less" scoped>

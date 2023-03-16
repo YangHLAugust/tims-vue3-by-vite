@@ -6,6 +6,7 @@ export default {
     successTip: '成功提示',
     errorMessage: '操作失败,系统异常!',
     timeoutMessage: '登录超时,请重新登录!',
+    lockedMessage: '您的账户已被锁定，请联系管理员！',
     apiTimeoutMessage: '接口请求超时,请刷新页面重试!',
     apiRequestFailed: '请求出错，请稍候重试',
     networkException: '网络异常',
