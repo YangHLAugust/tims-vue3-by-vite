@@ -131,7 +131,7 @@ const transform: AxiosTransform = {
       return res.data;
     }
 
-    const { data } = res;
+    const data = res?.data;
     if (!data) {
       throw new Error(t("sys.api.apiRequestFailed"));
     }

@@ -25,7 +25,7 @@ export const createS = ({
      * Set cache
      * @param {string} key
      * @param {*} value
-     * @param {*} expire Expiration time in seconds
+     * @param {*} expire Expiration time in days
      * @memberof Cache
      */
     set(key: string, value: any, expire: number | null = timeOut) {
@@ -33,7 +33,7 @@ export const createS = ({
         value,
         time: Date.now(),
         expire: !isNullOrUnDef(expire)
-          ? new Date().getTime() + expire * 1000
+          ? new Date().getTime() + expire * 1000 * 60 * 60 * 24
           : null,
       });
       this.storage.setItem(this.getKey(key), stringData);
@@ -66,6 +66,12 @@ export const createS = ({
      */
     remove(key: string) {
       this.storage.removeItem(this.getKey(key));
+    }
+
+    removeBatch(keys: string[]) {
+      keys.forEach((key) => {
+        this.storage.removeItem(this.getKey(key));
+      });
     }
 
     /**

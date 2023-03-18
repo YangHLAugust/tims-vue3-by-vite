@@ -19,6 +19,7 @@ Object.keys(modules).forEach((key) => {
 });
 
 export const asyncRoutes = [...routeModuleList];
+console.log("asyncRoutes", asyncRoutes);
 
 const RootRoute: AppRouteRecordRaw = {
   path: "/",
@@ -45,6 +46,28 @@ const LoginRoute: AppRouteRecordRaw = {
   meta: {
     title: "登录",
   },
+};
+
+export const REDIRECT_ROUTE: AppRouteRecordRaw = {
+  path: "/redirect",
+  component: Layout,
+  name: "RedirectTo",
+  meta: {
+    title: "redirect",
+    hideBreadcrumb: true,
+    hideMenu: true,
+  },
+  children: [
+    {
+      path: "/redirect/:path(.*)",
+      name: "redirect",
+      component: () => import("/@/views/redirect/index.vue"),
+      meta: {
+        title: "redirect",
+        hideBreadcrumb: true,
+      },
+    },
+  ],
 };
 
 export const basicRoutes = [LoginRoute, RootRoute];

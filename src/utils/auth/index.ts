@@ -13,7 +13,7 @@ interface BasicStore {
   [PERMISSIONS_KEY]: string[];
   [USER_INFO_KEY]: UserInfo;
 }
-type storageType = "local" | "session";
+export type storageType = "local" | "session";
 
 type BasicKey = keyof BasicStore;
 const ls = createLocalStorage();
@@ -22,9 +22,10 @@ const ss = createSessionStorage();
 function setFn(
   key: BasicKey,
   value: BasicStore[BasicKey],
+  expire: number | null,
   storage: storageType = "local"
 ): void {
-  storage === "local" ? ls.set(key, value) : ss.set(key, value);
+  storage === "local" ? ls.set(key, value, expire) : ss.set(key, value, expire);
 }
 
 function getFn<T>(key: BasicKey, storage: storageType = "local") {
@@ -34,9 +35,10 @@ function getFn<T>(key: BasicKey, storage: storageType = "local") {
 export function setAuthCache(
   key: BasicKey,
   value: BasicStore[BasicKey],
+  expire: number | null,
   storage: storageType = "local"
 ) {
-  return setFn(key, value, storage);
+  return setFn(key, value, expire, storage);
 }
 
 export function getAuthCache<T>(key: BasicKey, storage: storageType = "local") {
@@ -45,6 +47,17 @@ export function getAuthCache<T>(key: BasicKey, storage: storageType = "local") {
 
 export function clearAuthCache(storage: storageType = "local"): void {
   storage === "local" ? ls.clear() : ss.clear();
+}
+
+export function removeBatchCache(
+  keys: string[],
+  storage: storageType = "local"
+) {
+  return storage === "local" ? ls.removeBatch(keys) : ss.removeBatch(keys);
+}
+
+export function removeCache(key: string, storage: storageType = "local") {
+  return storage === "local" ? ls.remove(key) : ss.remove(key);
 }
 
 export function clearAuthAllCache(): void {

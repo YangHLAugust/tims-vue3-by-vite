@@ -97,10 +97,9 @@ const rememberMe = ref(true);
 const formData = reactive({
   account: "yhl",
   password: "Tengyun@60018",
-  codeValue: 1,
+  codeValue: null,
   uuid: null,
 });
-console.log(getFormRules);
 const { validForm } = useFormValid(formRef);
 
 async function getCode() {

@@ -64,3 +64,8 @@ export function deepMerge<T = any>(src: any = {}, target: any = {}): T {
   }
   return res;
 }
+
+// 获取本地图片路径
+export const getImageUrl = (name: string): string => {
+  return new URL(`/src/assets/images/${name}`, import.meta.url).href;
+};

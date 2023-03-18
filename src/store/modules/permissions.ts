@@ -86,9 +86,11 @@ export const usePermissionStore = defineStore({
           this.buttonPermissionInner[per[0]][per[1]][per[2]][per[3]] = true;
         }
       });
+
       const accessedRoutes = filterAsyncRoutes(asyncRoutes, permissions);
 
       this.permRouterList = basicRoutes.concat(accessedRoutes);
+
       this.addRouteList = accessedRoutes;
     },
     setLastBuildMenuTime() {
