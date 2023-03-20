@@ -44,3 +44,8 @@ export interface Result<T = any> {
   msg: string;
   data: T;
 }
+
+export interface PromiseAllSuccess {
+  status: string;
+  value: value;
+}

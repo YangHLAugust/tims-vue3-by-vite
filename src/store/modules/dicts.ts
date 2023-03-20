@@ -1,35 +1,9 @@
-import type { storageType } from "/@/utils/auth";
+import type { storageType, dictType, dictsState, dictsKey } from "/#/store";
 import { store } from "/@/store";
 import { defineStore } from "pinia";
-
-type dictType = Partial<
-  Array<{
-    createTime: string | null;
-    createUser: string | null;
-    createUserName: string | null;
-    description: string | null;
-    dictCode: string;
-    dictId: string;
-    id: string;
-    isDeleted: number;
-    itemKey: string;
-    itemValue: string;
-    persId: string;
-    sortOrder: number;
-    status: number;
-    updateTime: string | null;
-    updateUser: string | null;
-    updateUserName: string | null;
-  }>
->;
-
-interface dictsState {
-  dictsOption: {
-    sex: dictType;
-    if: dictType;
-    code_rule_tims: dictType;
-  };
-}
+import { getDictsCache } from "/@/utils/dicts";
+import { DICTS_KEY, DICTS_ALL_NAME } from "/@/enums/cacheEnum";
+import { isEmpty } from "/@/utils/is";
 
 export const dictsStore = defineStore({
   id: "app-dicts",
@@ -42,7 +16,26 @@ export const dictsStore = defineStore({
   }),
   getters: {
     getDictOptions(): dictsState {
-      return { dictsOption: this.dictsOption } || {};
+      const hasEmpty = Object.values(DICTS_ALL_NAME).some((item) =>
+        isEmpty(this.dictsOption[item])
+      );
+      const res = hasEmpty
+        ? { dictsOption: getDictsCache<dictsState>(DICTS_KEY) } || {
+            dictsOption: {},
+          }
+        : { dictsOption: this.dictsOption };
+      return res;
+    },
+  },
+
+  actions: {
+    setDictOptions(key: dictsKey, value: dictType) {
+      this.dictsOption[key] = value;
     },
   },
 });
+
+// 需要在设置外使用
+export function useDictsStoreWithOut() {
+  return dictsStore(store);
+}

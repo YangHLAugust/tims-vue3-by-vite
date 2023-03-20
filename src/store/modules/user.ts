@@ -1,11 +1,14 @@
-import type { UserInfo } from "/#/store";
-import type { storageType } from "/@/utils/auth";
+import type { UserInfo, storageType } from "/#/store";
+import type { PromiseAllSuccess } from "/#/axios";
 import { store } from "/@/store";
 import { defineStore } from "pinia";
 import { router } from "/@/router";
 import { RouteRecordRaw } from "vue-router";
+import { DICTS_ALL_NAME, DICTS_KEY } from "/@/enums/cacheEnum";
 import { getAuthCache, setAuthCache, removeBatchCache } from "/@/utils/auth";
-
+import { isEmpty } from "/@/utils/is";
+import { setDictsCache } from "/@/utils/dicts";
+import { useDictsStoreWithOut } from "/@/store/modules/dicts";
 import {
   ACCESS_TOKEN_KEY,
   REFRESH_TOKEN_KEY,
@@ -16,7 +19,8 @@ import { PageEnum } from "/@/enums/pageEnum";
 import { usePermissionStoreWithOut } from "/@/store/modules/permissions";
 import { LoginParams } from "/@/api/user/model/userModel";
 import { loginApi } from "/@/api/user";
-
+import { getDictItemApi } from "/@/api/dicts";
+const dictsStore = useDictsStoreWithOut();
 interface UserState {
   userInfo: Nullable<UserInfo>;
   permissions: Nullable<string[]>;
@@ -142,13 +146,36 @@ export const userStore = defineStore({
         this.setUpdatePasswordTime(updatePasswordTime);
         this.setUserInfo(data);
         this.setAllUserCache(copyData);
+        await this.getAllDicts();
         await this.afterLoginAction(goHome);
         return Promise.resolve(copyData);
       } catch (error) {
         return Promise.reject(error);
       }
     },
-
+    // 获取所有字典
+    async getAllDicts(dictsKey?: string[]) {
+      console.log("enterGetAllDicts");
+      let arr = Object.values(DICTS_ALL_NAME);
+      if (!isEmpty(dictsKey)) {
+        arr = dictsKey;
+      }
+      let dictsOptions = {};
+      if (arr.length) {
+        const promRes = await Promise.allSettled(
+          arr.map((v) => getDictItemApi(v))
+        );
+        promRes.forEach((item, idx) => {
+          //@ts-ignore
+          dictsOptions[arr[idx]] = item.value;
+        });
+        if (!isEmpty(dictsOptions)) {
+          console.log('setCache');
+          
+          setDictsCache(DICTS_KEY, dictsOptions, null);
+        }
+      }
+    },
     async afterLoginAction(goHome?: boolean) {
       if (!this.getAccessToken) return null;
       const permissionStore = usePermissionStoreWithOut();

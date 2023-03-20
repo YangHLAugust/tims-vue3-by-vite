@@ -1,12 +1,19 @@
 import type { Router } from "vue-router";
 import { useUserStoreWithOut } from "/@/store/modules/user";
 import { usePermissionStoreWithOut } from "/@/store/modules/permissions";
+// import { useDictsStoreWithOut } from "/@/store/modules/dicts";
+
 import { PageEnum } from "/@/enums/pageEnum";
 import { RouteRecordRaw } from "vue-router";
 import { router as _router } from "/@/router";
+
+// import { isEmpty } from "/@/utils/is";
+import { DICTS_ALL_NAME } from "/@/enums/cacheEnum";
+
 export function createPermissionGuard(router: Router) {
   const userStore = useUserStoreWithOut();
   const permissionStore = usePermissionStoreWithOut();
+  // const dictsStore = useDictsStoreWithOut();
   router.beforeEach(async (to, from, next) => {
     const token = userStore.getAccessToken;
     const whitePathList: PageEnum[] = [
@@ -51,21 +58,25 @@ export function createPermissionGuard(router: Router) {
       return;
     }
 
+    // 字典为空则重新请求
+    // const dictsOption = dictsStore.getDictOptions;
+    // const dictArr = Object.values(DICTS_ALL_NAME);
+    // const emptyDictArr = dictArr.filter((item) =>
+    //   isEmpty(dictsOption?.dictsOption[item])
+    // );
+    // emptyDictArr?.length && userStore.getAllDicts(emptyDictArr);
     const routes = permissionStore.getPermRouterList;
     if (routes?.length <= 2) {
       // 浏览器刷新，重新获取路由
-      // const permissions = userStore.getPermissions;
-      // permissionStore.setAllPermissions(permissions as string[]);
-      // const routes = permissionStore.getPermRouterList;
-      // routes.forEach((route) => {
-      //   _router.addRoute(route as unknown as RouteRecordRaw);
-      // });
       await userStore.afterLoginAction();
       const redirectPath = (from.query.redirect || to.path) as string;
       const nextData =
         to.path === redirectPath
           ? { ...to, replace: true }
           : { path: redirectPath };
+      // 修改为刷新重新请求字典
+      const dictArr = Object.values(DICTS_ALL_NAME);
+      userStore.getAllDicts(dictArr);
       next(nextData);
     } else {
       next();
