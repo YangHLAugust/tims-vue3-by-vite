@@ -1,10 +1,9 @@
-import type { App } from "vue";
+import { shallowRef, type App } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHashHistory } from "vue-router";
 import { PageEnum } from "/@/enums/pageEnum";
 
 import type { AppRouteRecordRaw, AppRouteModule } from "/@/router/types";
-
 /* Layout */
 import Layout from "/@/layout/index.vue";
 // import.meta.globEager() 直接引入所有的模块 Vite 独有的功能
@@ -23,11 +22,13 @@ console.log("asyncRoutes", asyncRoutes);
 
 const RootRoute: AppRouteRecordRaw = {
   path: "/",
-  name: "Root",
-  component: Layout,
+  name: "Dashboard",
+  component: shallowRef(Layout),
   redirect: PageEnum.BASE_HOME,
   meta: {
-    title: "Root",
+    title: "工作台",
+    hideChildrenInMenu: true,
+    icon: "flat-color-icons:home",
   },
   children: [
     {
@@ -45,12 +46,13 @@ const LoginRoute: AppRouteRecordRaw = {
   component: () => import("/@/views/login/Login.vue"),
   meta: {
     title: "登录",
+    hideInMenu: true,
   },
 };
 
 export const REDIRECT_ROUTE: AppRouteRecordRaw = {
   path: "/redirect",
-  component: Layout,
+  component: shallowRef(Layout),
   name: "RedirectTo",
   meta: {
     title: "redirect",
@@ -65,6 +67,7 @@ export const REDIRECT_ROUTE: AppRouteRecordRaw = {
       meta: {
         title: "redirect",
         hideBreadcrumb: true,
+        hideInMenu: true,
       },
     },
   ],

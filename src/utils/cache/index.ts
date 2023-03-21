@@ -3,7 +3,7 @@ import { createS, CreateStorageParams } from "/@/utils/cache/storageCache";
 
 export type Options = Partial<CreateStorageParams>;
 
-const DEFAULT_CACHE_TIME = 60 * 60 * 24 * 7;
+const DEFAULT_CACHE_TIME = 60 * 60 * 24 * 30;
 
 const createOption = (
   storage: Storage = sessionStorage,
@@ -32,4 +32,8 @@ export const createSessionStorage = (options: Options = {}) => {
   return createS(
     createOption(sessionStorage, { ...options, timeOut: DEFAULT_CACHE_TIME })
   );
+};
+
+export const createCookie = (options: Options = {}) => {
+  return createS({ ...options, timeOut: DEFAULT_CACHE_TIME });
 };

@@ -2,9 +2,8 @@ import type { Router } from "vue-router";
 import { useUserStoreWithOut } from "/@/store/modules/user";
 import { usePermissionStoreWithOut } from "/@/store/modules/permissions";
 // import { useDictsStoreWithOut } from "/@/store/modules/dicts";
-
+import { getToken } from "/@/utils/auth";
 import { PageEnum } from "/@/enums/pageEnum";
-import { RouteRecordRaw } from "vue-router";
 import { router as _router } from "/@/router";
 
 // import { isEmpty } from "/@/utils/is";
@@ -15,7 +14,7 @@ export function createPermissionGuard(router: Router) {
   const permissionStore = usePermissionStoreWithOut();
   // const dictsStore = useDictsStoreWithOut();
   router.beforeEach(async (to, from, next) => {
-    const token = userStore.getAccessToken;
+    const token = getToken();
     const whitePathList: PageEnum[] = [
       PageEnum.RESET_PSW,
       PageEnum.BASE_LOGIN,

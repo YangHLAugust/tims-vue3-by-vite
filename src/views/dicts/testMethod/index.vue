@@ -1,6 +1,8 @@
 <template>
-  <div>testMethod</div>
-  <div>{{ dictOptions }}</div>
+  <div class="test-method">
+    <div>testMethod</div>
+    <div>{{ dictOptions }}</div>
+  </div>
 </template>
 
 <script lang="ts" setup>

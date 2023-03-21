@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import type { AppRouteRecordRaw } from "/@/router/types";
 import { asyncRoutes, basicRoutes } from "/@/router";
 import { store } from "/@/store";
+import { uniqueSlash } from "/@/utils";
 // import { useUserStoreWithOut } from "/@/store/modules/user";
 // const userStore = useUserStoreWithOut();
 // const permissions: string[] = userStore.getPermissions;
@@ -87,8 +88,8 @@ export const usePermissionStore = defineStore({
         }
       });
 
-      const accessedRoutes = filterAsyncRoutes(asyncRoutes, permissions);
-
+      let accessedRoutes = filterAsyncRoutes(asyncRoutes, permissions);
+      generatorNamePath(accessedRoutes);
       this.permRouterList = basicRoutes.concat(accessedRoutes);
 
       this.addRouteList = accessedRoutes;
@@ -131,3 +132,30 @@ function filterAsyncRoutes(
   });
   return res;
 }
+
+/**
+ * 主要方便于控制a-menu的open-keys，即控制左侧菜单应当展开哪些菜单
+ * @param {AppRouteRecordRaw[]} routes 需要添加namePath的路由
+ * @param {string[]} namePath
+ */
+export const generatorNamePath = (
+  routes: AppRouteRecordRaw[],
+  namePath?: string[],
+  parent?: AppRouteRecordRaw
+) => {
+  routes.forEach((item) => {
+    if (item.meta && typeof item.name === "string") {
+      item.meta.namePath = Array.isArray(namePath)
+        ? namePath.concat(item.name)
+        : [item.name];
+      item.meta.fullPath = parent?.meta?.fullPath
+        ? [parent.meta.fullPath, item.path].join("/")
+        : item.path;
+      item.meta.fullPath = uniqueSlash(item.meta.fullPath as string);
+
+      if (item.children?.length) {
+        generatorNamePath(item.children, item.meta.namePath as string[], item);
+      }
+    }
+  });
+};

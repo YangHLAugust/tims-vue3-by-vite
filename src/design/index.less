@@ -1,3 +1,7 @@
+@import 'transition/index.less';
+
+@namespace: tims;
+
 input:-webkit-autofill {
   box-shadow: 0 0 0 1000px white inset !important;
 }
@@ -35,4 +39,30 @@ div,
 svg,
 span {
   outline: none;
+}
+.flex-box {
+  display: flex;
+  align-items: center;
+}
+
+.flex-x-c-c {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-x-c-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.flex-x-c-evenly {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.flex-y {
+  display: flex;
+  flex-direction: column;
 }

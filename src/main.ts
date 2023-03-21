@@ -1,11 +1,13 @@
+import "/@/design/index.less";
+import "ant-design-vue/dist/antd.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import { setupStore } from "/@/store/index";
 import { router, setupRouter } from "/@/router";
 import { setupRouterGuard } from "./router/guard";
-import { setupI18n } from '/@/locales/setupI18n';
+import { setupI18n } from "/@/locales/setupI18n";
+import { setupGlobDirectives } from "/@/directives";
 
-import "ant-design-vue/dist/antd.css";
 async function bootstrap() {
   const app = createApp(App);
 
@@ -26,6 +28,10 @@ async function bootstrap() {
   // router-guard
   // 路由守卫
   setupRouterGuard(router);
+
+  // Register global directive
+  // 注册全局指令
+  setupGlobDirectives(app);
 
   app.mount("#app");
 }

@@ -3,7 +3,12 @@ import type { AxiosTransform, CreateAxiosOptions } from "./axiosTransform";
 import type { RequestOptions, Result } from "/#/axios";
 import { VAxios } from "./Axios";
 import { useGlobSetting } from "/@/hooks/setting";
-import { getToken, getRefreshToken } from "/@/utils/auth";
+import {
+  getToken,
+  getRefreshToken,
+  removeAccessCookie,
+  removeRefreshCookie,
+} from "/@/utils/auth";
 import { isString, isUnDef, isNull, isEmpty } from "/@/utils/is";
 import { joinTimestamp, formatRequestDate } from "./helper";
 import { RequestEnum, ResultEnum, ContentTypeEnum } from "/@/enums/httpEnum";
@@ -11,11 +16,13 @@ import { setObjToUrlParams, deepMerge } from "/@/utils";
 import { useI18n } from "/@/utils/useI18n";
 import { useMessage } from "/@/hooks/web/useMessage";
 import { useUserStoreWithOut } from "/@/store/modules/user";
+import { useAppStoreWithOut } from "/@/store/modules/app";
 const { createMessage, createErrorModal, createSuccessModal } = useMessage();
 import { clone } from "lodash-es";
 
 const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix;
+const appStore = useAppStoreWithOut();
 
 const transform: AxiosTransform = {
   // 请求之前处理config
@@ -94,12 +101,14 @@ const transform: AxiosTransform = {
       (config as Recordable).headers.common["Refresh-Token"] =
         getRefreshToken();
     }
-    // 开启loading
+    if (!(config as Recordable)?.requestOptions?.hideLoading)
+      appStore.setPageLoadingAction(true);
     return config;
   },
   // 请求错误处理
   requestInterceptorsCatch: (err: Error) => {
     // 关闭loading
+    appStore.setPageLoadingAction(false);
     console.log(err);
   },
 
@@ -108,6 +117,7 @@ const transform: AxiosTransform = {
    */
   responseInterceptors: (res: AxiosResponse<any>) => {
     // 结束loading
+    appStore.setPageLoadingAction(false);
     return res;
   },
 
@@ -133,6 +143,7 @@ const transform: AxiosTransform = {
 
     const data = res?.data;
     if (!data) {
+      appStore.setPageLoadingAction(false);
       throw new Error(t("sys.api.apiRequestFailed"));
     }
 
@@ -164,8 +175,8 @@ const transform: AxiosTransform = {
       case ResultEnum.TIMEOUT:
         errMsg = t("sys.api.timeoutMessage");
         const userStore = useUserStoreWithOut();
-        userStore.setAccessToken(undefined);
-        userStore.setRefreshToken(undefined);
+        removeAccessCookie();
+        removeRefreshCookie();
         userStore.logout(true);
         break;
       case ResultEnum.LOCKED:
@@ -187,7 +198,7 @@ const transform: AxiosTransform = {
         createMessage.error(errMsg, 5);
       }
     }
-
+    appStore.setPageLoadingAction(false);
     throw new Error(errMsg || t("sys.api.apiRequestFailed"));
   },
 
@@ -196,6 +207,7 @@ const transform: AxiosTransform = {
    */
   responseInterceptorsCatch: (axiosInstance: AxiosResponse, error: any) => {
     // 后面再写
+    appStore.setPageLoadingAction(false);
   },
 };
 

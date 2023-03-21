@@ -46,7 +46,7 @@ const title = "检验项目管理系统";
   background: #fff;
   text-align: center;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  box-shadow: 0 4px 4px -3px rgba(0, 21, 41, 0.08);
   margin-bottom: 4px;
 
   & .sidebar-logo-link {

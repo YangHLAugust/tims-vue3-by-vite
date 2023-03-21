@@ -5,7 +5,14 @@ import { defineStore } from "pinia";
 import { router } from "/@/router";
 import { RouteRecordRaw } from "vue-router";
 import { DICTS_ALL_NAME, DICTS_KEY } from "/@/enums/cacheEnum";
-import { getAuthCache, setAuthCache, removeBatchCache } from "/@/utils/auth";
+import {
+  getAuthCache,
+  setAuthCache,
+  removeBatchCache,
+  getToken,
+  setRefreshToken,
+  setToken,
+} from "/@/utils/auth";
 import { isEmpty } from "/@/utils/is";
 import { setDictsCache } from "/@/utils/dicts";
 import { useDictsStoreWithOut } from "/@/store/modules/dicts";
@@ -24,8 +31,6 @@ const dictsStore = useDictsStoreWithOut();
 interface UserState {
   userInfo: Nullable<UserInfo>;
   permissions: Nullable<string[]>;
-  accessToken: string;
-  refreshToken: string;
   tokenType?: string;
   updatePasswordTime?: number | string | null | undefined;
   roleId?: string[];
@@ -40,18 +45,10 @@ export const userStore = defineStore({
   state: (): UserState => ({
     userInfo: null,
     permissions: null,
-    accessToken: "",
-    refreshToken: "",
     updatePasswordTime: "",
     roles: null,
   }),
   getters: {
-    getAccessToken(): string {
-      return this.accessToken || getAuthCache<string>(ACCESS_TOKEN_KEY);
-    },
-    getRefreshToken(): string {
-      return this.refreshToken || getAuthCache<string>(REFRESH_TOKEN_KEY);
-    },
     getUserInfo(): UserInfo {
       return this.userInfo || getAuthCache<UserInfo>(USER_INFO_KEY) || {};
     },
@@ -63,12 +60,6 @@ export const userStore = defineStore({
     },
   },
   actions: {
-    setAccessToken(info: string | undefined) {
-      this.accessToken = info ? info : "";
-    },
-    setRefreshToken(info: string | undefined) {
-      this.refreshToken = info ? info : "";
-    },
     setUserInfo(info: UserInfo | null) {
       this.userInfo = info;
     },
@@ -86,9 +77,7 @@ export const userStore = defineStore({
       time: number | null = null,
       storage: storageType = "local"
     ) {
-      const { accessToken, refreshToken, userInfo, permissions } = info;
-      setAuthCache(ACCESS_TOKEN_KEY, accessToken, time, storage);
-      setAuthCache(REFRESH_TOKEN_KEY, refreshToken, time, storage);
+      const { userInfo, permissions } = info;
       setAuthCache(USER_INFO_KEY, userInfo, time, storage);
       setAuthCache(PERMISSIONS_KEY, permissions, time, storage);
     },
@@ -103,8 +92,6 @@ export const userStore = defineStore({
     },
     resetState() {
       this.userInfo = null;
-      this.accessToken = "";
-      this.refreshToken = "";
       this.updatePasswordTime = "";
       this.permissions = [];
       this.roles = [];
@@ -139,8 +126,8 @@ export const userStore = defineStore({
           roles,
           updatePasswordTime,
         } = copyData;
-        this.setAccessToken(accessToken);
-        this.setRefreshToken(refreshToken);
+        setToken(accessToken, null);
+        setRefreshToken(refreshToken, null);
         this.setPermissions(permissions);
         this.setRoles(roles);
         this.setUpdatePasswordTime(updatePasswordTime);
@@ -154,14 +141,13 @@ export const userStore = defineStore({
       }
     },
     // 获取所有字典
-    async getAllDicts(dictsKey?: string[]) {
-      console.log("enterGetAllDicts");
+    async getAllDicts(dictsKey?: DICTS_ALL_NAME[]) {
       let arr = Object.values(DICTS_ALL_NAME);
-      if (!isEmpty(dictsKey)) {
+      if (dictsKey?.length) {
         arr = dictsKey;
       }
       let dictsOptions = {};
-      if (arr.length) {
+      if (arr?.length) {
         const promRes = await Promise.allSettled(
           arr.map((v) => getDictItemApi(v))
         );
@@ -170,14 +156,12 @@ export const userStore = defineStore({
           dictsOptions[arr[idx]] = item.value;
         });
         if (!isEmpty(dictsOptions)) {
-          console.log('setCache');
-          
           setDictsCache(DICTS_KEY, dictsOptions, null);
         }
       }
     },
     async afterLoginAction(goHome?: boolean) {
-      if (!this.getAccessToken) return null;
+      if (!getToken()) return null;
       const permissionStore = usePermissionStoreWithOut();
       permissionStore.setAllPermissions(this.getPermissions as string[]);
       const routes = permissionStore.getPermRouterList;

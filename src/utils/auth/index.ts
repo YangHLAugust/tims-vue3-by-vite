@@ -1,4 +1,8 @@
-import { createLocalStorage, createSessionStorage } from "/@/utils/cache";
+import {
+  createLocalStorage,
+  createSessionStorage,
+  createCookie,
+} from "/@/utils/cache";
 import type { UserInfo, storageType } from "/#/store";
 import {
   ACCESS_TOKEN_KEY,
@@ -17,6 +21,7 @@ interface BasicStore {
 type BasicKey = keyof BasicStore;
 const ls = createLocalStorage();
 const ss = createSessionStorage();
+const cookie = createCookie();
 
 function setFn(
   key: BasicKey,
@@ -30,7 +35,21 @@ function setFn(
 function getFn<T>(key: BasicKey, storage: storageType = "local") {
   return (storage === "local" ? ls.get(key) : ss.get(key)) as Nullable<T>;
 }
+function setCookie(
+  key: BasicKey,
+  value: BasicStore[BasicKey],
+  expire: number | null
+) {
+  cookie.setCookie(key, value, expire);
+}
 
+function getCookie<T>(key: BasicKey) {
+  return cookie.getCookie(key) as T;
+}
+
+function removeC(key: BasicKey) {
+  cookie.removeCookie(key);
+}
 export function setAuthCache(
   key: BasicKey,
   value: BasicStore[BasicKey],
@@ -64,10 +83,35 @@ export function clearAuthAllCache(): void {
   ss.clear();
 }
 
+// export function getToken() {
+//   return getAuthCache(ACCESS_TOKEN_KEY);
+// }
+
+// export function getRefreshToken() {
+//   return getAuthCache(REFRESH_TOKEN_KEY);
+// }
+
+export function setToken(value: BasicStore[BasicKey], expire: number | null) {
+  return setCookie(ACCESS_TOKEN_KEY, value, expire);
+}
+
 export function getToken() {
-  return getAuthCache(ACCESS_TOKEN_KEY);
+  return getCookie(ACCESS_TOKEN_KEY);
+}
+export function setRefreshToken(
+  value: BasicStore[BasicKey],
+  expire: number | null
+) {
+  return setCookie(REFRESH_TOKEN_KEY, value, expire);
 }
 
 export function getRefreshToken() {
-  return getAuthCache(REFRESH_TOKEN_KEY);
+  return getCookie(REFRESH_TOKEN_KEY);
+}
+
+export function removeAccessCookie() {
+  return removeC(ACCESS_TOKEN_KEY);
+}
+export function removeRefreshCookie() {
+  return removeC(ACCESS_TOKEN_KEY);
 }

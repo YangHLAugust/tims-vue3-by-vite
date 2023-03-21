@@ -4,6 +4,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import legacy from '@vitejs/plugin-legacy';
 import windiCSS from 'vite-plugin-windicss';
 //import vueSetupExtend from 'vite-plugin-vue-setup-extend';
+import purgeIcons from 'vite-plugin-purge-icons';
 import { configHtmlPlugin } from './html';
 import { configPwaConfig } from './pwa';
 import { configMockPlugin } from './mock';
@@ -39,7 +40,7 @@ export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
   VITE_USE_MOCK && vitePlugins.push(configMockPlugin(isBuild));
 
   // vite-plugin-purge-icons
-  // vitePlugins.push(purgeIcons());
+  vitePlugins.push(purgeIcons());
 
   // vite-plugin-style-import
   vitePlugins.push(configStyleImportPlugin(isBuild));

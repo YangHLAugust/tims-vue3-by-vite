@@ -1,33 +1,45 @@
-import Layout from '/@/layout/index.vue'
-
+import Layout from "/@/layout/index.vue";
+import { shallowRef } from "vue";
+import { useI18n } from "/@/utils/useI18n";
+const { t } = useI18n();
 const dictsRouter = {
-  path: '/dicts',
-  component: Layout,
-  redirect: '/dicts/categoryItem',
+  path: "/dicts",
+  name: "dicts",
+  component: shallowRef(Layout),
+  redirect: "/dicts/testMethod",
   meta: {
-    title: '基础字典',
-    icon: 'icon_dict',
-    permissions: ['tims:dict']
+    title: t("routes.dicts.basicDictionary"),
+    icon: "fluent-emoji:green-book",
+    permissions: ["tims:dict"],
   },
   children: [
     {
-      path: 'testMethod',
-      name: 'DictsTestMethod',
-      component: () => import('/@/views/dicts/testMethod/index.vue'),
-      meta: { title: '检验方法', permissions: ['tims:dict:test_method'] }
+      path: "testMethod",
+      name: "DictsTestMethod",
+      component: () => import("/@/views/dicts/testMethod/index.vue"),
+      meta: {
+        title: t("routes.dicts.testMethod"),
+        permissions: ["tims:dict:test_method"],
+      },
     },
     {
-      path: 'sampleType',
-      name: 'DictsSampleType',
-      component: () => import('/@/views/dicts/sampleType/index.vue'),
-      meta: { title: '样本类型', permissions: ['tims:dict:sample_type'] }
+      path: "sampleType",
+      name: "DictsSampleType",
+      component: () => import("/@/views/dicts/sampleType/index.vue"),
+      meta: {
+        title: t("routes.dicts.sampleType"),
+        permissions: ["tims:dict:sample_type"],
+      },
     },
     {
-      path: 'resultPrecision',
-      name: 'DictsResultPrecision',
-      component: () => import('/@/views/dicts/resultPrecision/index.vue'),
-      meta: { title: '结果精度', permissions: ['tims:dict:result_precision'] }
-    }
-  ]
-}
-export default dictsRouter
+      path: "resultPrecision",
+      name: "DictsResultPrecision",
+      component: () => import("/@/views/dicts/resultPrecision/index.vue"),
+      meta: {
+        title: t("routes.dicts.resultPrecision"),
+        permissions: ["tims:dict:result_precision"],
+      },
+    },
+  ],
+};
+export default dictsRouter;
